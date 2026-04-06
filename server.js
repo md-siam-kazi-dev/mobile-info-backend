@@ -112,7 +112,38 @@ function shuffleArray(array) {
 app.get("/", (_req, res) => {
   res.json({ message: "API Running 🚀" });
 });
+//:slug
+app.get("/api/phones/:slug", (req, res) => {
+  try {
+    const { slug } = req.params;
 
+    const phone = PHONES.find(
+      (p) => p.slug.toLowerCase() === slug.toLowerCase()
+    );
+
+    if (!phone) {
+      return res.status(404).json({
+        success: false,
+        error: "Phone not found",
+      });
+    }
+
+    // Optional: related phones (same brand)
+    const related = PHONES.filter(
+      (p) =>
+        p.brand === phone.brand &&
+        p.slug !== phone.slug
+    ).slice(0, 4);
+
+    res.json({
+      success: true,
+      data: phone,
+      related,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // 🔥 UPDATED ROUTE
 app.get("/api/phones", (req, res) => {
   try {
