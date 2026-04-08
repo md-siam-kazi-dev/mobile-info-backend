@@ -173,7 +173,14 @@ app.get("/", (_req, res) => {
 app.get("/api/phones", (req, res) => {
   try {
     let phones = applyFilters(PHONES, req.query);
-    phones = applySort(phones, req.query.sort_by);
+
+    // Only shuffle when no sort is requested (default random browsing)
+    // If sort_by is given, skip shuffle so sort actually works
+    if (req.query.sort_by) {
+      phones = applySort(phones, req.query.sort_by);
+    } else {
+      phones = shuffleArray(phones);
+    }
 
     const { page, limit, skip } = parsePagination(req.query);
     const total = phones.length;
